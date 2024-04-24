@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de libros</title>
+</head>
+<body>
+    <h1>Buscador de libros</h1>
+    <form method="post">
+        <label for="palabra">Ingrese la palabra a buscar:</label>
+        <input type="text" id="palabra" name="palabra" value="{{ palabra }}">
+        <button type="submit">Buscar</button>
+    </form>
+    {% if libros_con_coincidencias %}
+        <h2>Libros con coincidencias:</h2>
+        <ul>
+            {% for libro in libros_con_coincidencias %}
+                <li><a href="/libro/{{ libro }}?palabra={{ palabra }}">{{ libro }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
