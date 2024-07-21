@@ -1,0 +1,16 @@
+/*
+OnlineOpinion v5.8.2
+Released: 02/27/2014. Compiled 04/23/2014 09:51:37 AM -0500
+Branch: CLIENTREQ-219 Apr
+Components: Full
+UMD: disabled
+The following code is Copyright 1998-2014 Opinionlab, Inc.  All rights reserved. Unauthorized use is prohibited. This product and other products of OpinionLab, Inc. are protected by U.S. Patent No. 6606581, 6421724, 6785717 B1 and other patents pending. http://www.opinionlab.com
+*/
+/*global OOo, window*/
+
+/* Inline configuration */
+window.oo_feedback = new OOo.Ocode({
+    onPageCard: {
+        closeWithOverlay: {}
+    }
+});

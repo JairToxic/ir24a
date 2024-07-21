@@ -1,0 +1,31 @@
+_satellite.pushAsyncScript(function(event, target, $variables){
+  var script = document.createElement('script');
+script.onload = function () {
+    //variable declaration
+    var category = _satellite.getVar('Floodlight - Category');
+    var UUID = _satellite.getVar('Customer Id');
+
+    //gtag global code initialisation
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'DC-5035317'); //Configuring all pages unique counter
+
+    //tracking all pages unique counter
+    gtag('event', 'conversion', {
+        'allow_custom_scripts': true,
+        'u1': category,
+        'u2': 'Device',
+        'u3': 'Brand',
+        'u4': 'AUID',
+        'u5': UUID,
+        'send_to': 'DC-5035317/realf0/brand0+unique'
+    });
+
+
+};
+script.src = "https://www.googletagmanager.com/gtag/js?id=DC-5035317";
+
+document.head.appendChild(script);
+});

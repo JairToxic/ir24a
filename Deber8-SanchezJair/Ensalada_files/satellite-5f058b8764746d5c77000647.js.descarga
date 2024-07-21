@@ -1,0 +1,9 @@
+_satellite.pushAsyncScript(function(event, target, $variables){
+  (function() {
+  var awMastertag = document.createElement("script");
+  awMastertag.setAttribute("defer", "defer");
+  awMastertag.src = "https://www.dwin1.com/7052.js";
+  awMastertag.type = "text/javascript";
+  document.body.appendChild(awMastertag);
+})();
+});

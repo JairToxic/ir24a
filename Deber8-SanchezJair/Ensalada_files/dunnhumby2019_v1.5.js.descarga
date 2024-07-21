@@ -1,0 +1,222 @@
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+var dfpTest = false;
+(function() {
+  var getLocation = function() {
+    var url = window.location.href,
+      loc = {};
+    if (url.indexOf("htm") !== -1) {
+      loc.path = url.slice(url.indexOf(".com/") + 5, url.lastIndexOf(".htm"));
+      if (loc.path === "index") loc.path = "homepage";
+    } else {
+      loc.path = "homepage";
+    }
+    if (url.indexOf("?search=") !== -1) {
+      loc.search = url.slice(url.lastIndexOf("?search=") + 8);
+      if (loc.search.indexOf("&") !== -1) {
+        loc.search = loc.search.slice(0, loc.search.indexOf("&"));
+      }
+      if (loc.search.indexOf("%20") !== -1) {
+        loc.search = loc.search.replace(/\%20/g, " ");
+        var arr = loc.search.split(" ");
+        arr.push(loc.search);
+        loc.search = arr;
+      }
+    }
+    if (url.indexOf("?st=") !== -1) {
+      loc.search = url.slice(url.lastIndexOf("?st=") + 4);
+      if (loc.search.indexOf("&") !== -1) {
+        loc.search = loc.search.slice(0, loc.search.indexOf("&"));
+      }
+      if (loc.search.indexOf("+") !== -1) {
+        loc.search = loc.search.replace(/\+/g, " ");
+        var arr = loc.search.split(" ");
+        arr.push(loc.search);
+        loc.search = arr;
+      }
+    }
+    return loc;
+  };
+  var getIngredients = function() {
+    var scripts = document.getElementsByTagName("script");
+    var script = [],
+      i = 0;
+    for (i; i < scripts.length; i++) {
+      if (scripts[i].type === "application/ld+json") script.push(scripts[i]);
+    }
+    var obj = {};
+    if (script.length) {
+      var j = 0;
+      for (j; j < script.length; j++) {
+        var item = JSON.parse(script[j].innerHTML);
+        var objs = [obj, item];
+        obj = objs.reduce(function(r, o) {
+          Object.keys(o).forEach(function(k) {
+            r[k] = o[k];
+          });
+          return r;
+        }, {});
+      }
+    }
+    return obj;
+  };
+  var getTitleKeywords = function() {
+    var arr = document.title.toLowerCase().split(" | ");
+    arr.pop();
+    return arr;
+  };
+  var getCookie = function(cname) {
+    var v = document.cookie.match("(^|;) ?" + cname + "=([^;]*)(;|$)");
+    return v ? v[2] : null;
+  };
+  var addClass = function(id) {
+    var el = document.getElementById(id).classList.add("gpt-ad-slot-full");
+  };
+  googletag.cmd.push(function() {
+    var uuid = getCookie("UUID");
+    var getSize = function() {
+      var x = document.body.offsetWidth;
+      if (x < 488) return 1;
+      if (x > 487 && x < 748) return 2;
+      if (x > 747 && x < 970) return 3;
+      if (x > 969) return 4;
+    };
+    var size = getSize();
+    if (typeof window.matchMedia !== "undefined") {
+      var mapping = googletag
+        .sizeMapping()
+        .addSize([748, 200], ["fluid", [728, 90]])
+        .addSize([488, 200], ["fluid", [468, 60]])
+        .addSize([200, 200], ["fluid", [300, 250], [320, 50]])
+        .build();
+      var mapping1 = googletag
+        .sizeMapping()
+        .addSize([970, 400], [970, 250])
+        .addSize([748, 400], [728, 90])
+        .addSize([0, 0], [])
+        .build();
+      var mapping2 = googletag
+        .sizeMapping()
+        .addSize([768, 200], [[300, 600], [300, 250]])
+        .addSize([748, 200], [[728, 90]])
+        .addSize([488, 200], [[468, 60]])
+        .addSize([200, 200], [[300, 250], [320, 50]])
+        .build();
+    }
+    var slot = [],
+      slots = {};
+    var path = getLocation();
+    var ingredients = getIngredients();
+    var adUnitPath = dfpTest
+      ? "/8326/beta-grocery/homepage"
+      : "/8326/realfood/" + path.path;
+    slot[0] = googletag
+      .defineSlot(
+        adUnitPath,
+        ["fluid", [728, 90]],
+        "div-gpt-ad-realfood-wide-0"
+      )
+      .setTargeting("pos", "top")
+      .defineSizeMapping(mapping)
+      .addService(googletag.pubads());
+    if (!path.search) {
+      slot[1] = googletag
+        .defineSlot(
+          adUnitPath,
+          ["fluid", [728, 90]],
+          "div-gpt-ad-realfood-wide-1"
+        )
+        .setTargeting("pos", "bottom")
+        .defineSizeMapping(mapping)
+        .addService(googletag.pubads());
+      slot[2] = googletag
+        .defineSlot(adUnitPath, [970, 250], "div-gpt-ad-realfood-hero-2")
+        .setTargeting("pos", "hero")
+        .defineSizeMapping(mapping1)
+        .addService(googletag.pubads());
+      if (document.body.classList[0] === "standard") {
+        slot[3] = googletag
+          .defineSlot(
+            adUnitPath,
+            [[300, 600], [300, 250]],
+            "div-gpt-ad-realfood-mpu-3"
+          )
+          .setTargeting("pos", "mpu")
+          .defineSizeMapping(mapping2)
+          .addService(googletag.pubads());
+      }
+    }
+    googletag.pubads().setTargeting("title", getTitleKeywords());
+    if (ingredients) {
+      if (ingredients.recipeIngredient) {
+        googletag
+          .pubads()
+          .setTargeting("recipe", ingredients.recipeIngredient);
+      }
+      if (ingredients.tags) {
+        ingredients.tags.forEach(function(tag) {
+          googletag
+            .pubads()
+            .setTargeting(tag.name.replace(/\s/g, ""), tag.values);
+        });
+      }
+    }
+    if (path.search) {
+      googletag.pubads().setTargeting("search", path.search);
+    }
+    if (uuid) {
+      googletag.pubads().setTargeting("tppid", uuid);
+      googletag.pubads().setPublisherProvidedId(uuid);
+    }
+    googletag.pubads().enableSingleRequest();
+    googletag.pubads().collapseEmptyDivs();
+    googletag.enableServices();
+    googletag.pubads().addEventListener("slotRenderEnded", function(event) {
+      if (!event.isEmpty) {
+        var id = event.slot.getSlotElementId();
+        document.getElementById(id).classList.add("gpt-ad-slot-full");
+        slots[event.creativeId] = id;
+        if (id === "div-gpt-ad-realfood-mpu-3") {
+          document
+            .querySelector(".section-popular-recipes .container .grid-8")
+            .classList.add("has-mpu");
+        }
+      }
+    });
+    var refreshGpt = function() {
+      var newsize = getSize();
+      if (newsize !== size) {
+        size = newsize;
+        googletag.pubads().refresh();
+      }
+    };
+    var setClass = function(id, bannertype, mpu) {
+      var slot = document.getElementById(slots[id]);
+      slot.classList.add("gpt-ad-slot-" + bannertype);
+      slot.classList.add("gpt-ad-slot-mpu-" + mpu);
+    };
+    var setIframeHeight = function(data) {
+      var slot = document.getElementById(slots[data.cid]);
+      var frame = slot.getElementsByTagName("iframe")[0];
+      slot.style.height = data.bannerHeight + "px";
+    };
+    var timer;
+    var handler = {
+      message: function(msg) {
+        if (msg.data.bannerHeight) setIframeHeight(msg.data);
+        if (msg.data.bannerType)
+          setClass(msg.data.cid, msg.data.bannerType, msg.data.mpu);
+      },
+      resize: function(e) {
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+          refreshGpt();
+        }, 250);
+      }
+    };
+    ["message", "resize"].forEach(function(event) {
+      window.addEventListener(event, handler[event], false);
+    });
+  });
+})();
+
