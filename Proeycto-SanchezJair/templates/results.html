@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Define el conjunto de caracteres utilizado en el documento -->
+    <meta charset="UTF-8">
+    <!-- Asegura que la página se muestre correctamente en dispositivos móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Título que aparece en la pestaña del navegador -->
+    <title>Search Results</title>
+    <!-- Enlace a la hoja de estilos de Bootstrap para diseño responsivo y componentes estilizados -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Enlace a una hoja de estilos personalizada para ajustes adicionales -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Contenedor principal para centrar el contenido y añadir márgenes -->
+    <div class="container mt-5 mb-5">
+        <!-- Encabezado principal de la página centrado -->
+        <h1 class="text-center">Search Results</h1>
+        
+        <!-- Mostrar imagen subida si existe -->
+        {% if query_image %}
+            <div class="uploaded-image text-center mt-5">
+                <h2>Your Uploaded Image</h2>
+                <!-- Imagen subida por el usuario, con modal para vista ampliada -->
+                <img src="{{ query_image }}" alt="Query Image" class="img-thumbnail" data-toggle="modal" data-target="#imageModal">
+                <p>This is the image you searched for.</p>
+            </div>
+        {% endif %}
+        
+        <!-- Mostrar resultados si hay imágenes similares -->
+        {% if similar_images %}
+            <div class="results mt-5">
+                <h2>Similar Images</h2>
+                <div class="row">
+                    <!-- Iterar sobre las imágenes similares -->
+                    {% for image, similarity, category in similar_images %}
+                        <div class="col-md-4 col-sm-6 mb-4">
+                            <div class="card">
+                                <!-- Imagen similar, con modal para vista ampliada -->
+                                <img src="{{ url_for('static', filename='data/caltech-101/' ~ image) }}" class="card-img-top" alt="Similar Image" data-toggle="modal" data-target="#imageModal" data-src="{{ url_for('static', filename='data/caltech-101/' ~ image) }}">
+                                <div class="card-body">
+                                    <!-- Mostrar similitud y categoría -->
+                                    <p class="card-text">Similarity: {{ '{:.2f}'.format(similarity) }}</p>
+                                    <p class="card-text">Category: {{ category }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <p>No similar images found.</p>
+        {% endif %}
+        
+        <!-- Botón para volver a la página de inicio -->
+        <div class="text-center mt-5">
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Modal para ver imágenes en detalle -->
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Image</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <!-- Imagen mostrada en el modal -->
+                    <img id="modal-image" src="" class="img-fluid" alt="Image">
+                </div>
+                <div class="modal-footer">
+                    <!-- Botón para cerrar el modal -->
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de JavaScript necesarios para los componentes de Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.com/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Script para manejar la visualización de la imagen en el modal -->
+    <script>
+        // JavaScript para manejar la visualización de imágenes en el modal
+        $('#imageModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Botón que activó el modal
+            var imageSrc = button.data('src'); // Extraer información de los atributos data-*
+            var modal = $(this);
+            modal.find('#modal-image').attr('src', imageSrc);
+        });
+    </script>
+</body>
+</html>
